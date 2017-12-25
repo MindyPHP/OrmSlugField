@@ -1,7 +1,7 @@
 # Orm Slug Field Component
 
 [![Build Status](https://travis-ci.org/MindyPHP/OrmSlugField.svg?branch=master)](https://travis-ci.org/MindyPHP/OrmSlugField)
-[![Coverage Status](https://img.shields.io/coveralls/MindyPHP/OrmSlugField.svg)](https://coveralls.io/r/MindyPHP/OrmSlugField)
+[![codecov](https://codecov.io/gh/MindyPHP/OrmSlugField/branch/master/graph/badge.svg)](https://codecov.io/gh/MindyPHP/OrmSlugField)
 [![Latest Stable Version](https://poser.pugx.org/mindy/orm-slug-field/v/stable.svg)](https://packagist.org/packages/mindy/orm-slug-field)
 [![Total Downloads](https://poser.pugx.org/mindy/orm-slug-field/downloads.svg)](https://packagist.org/packages/mindy/orm-slug-field)
 
