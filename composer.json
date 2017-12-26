@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~6.5",
-        "mindy/orm-nested-set": "~3.0|~4.0"
+        "mindy/orm-nested-set": ">=4.0"
     },
     "suggested": {
         "mindy/orm-nested-set": "Nested set for Mindy Orm"
