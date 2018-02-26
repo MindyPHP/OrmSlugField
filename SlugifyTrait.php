@@ -12,12 +12,16 @@ declare(strict_types=1);
 namespace Mindy\Orm\Fields;
 
 use Cocur\Slugify\Slugify;
+use Mindy\Orm\QuerySetInterface;
 
 /**
  * Class UniqueUrl.
  */
 trait SlugifyTrait
 {
+    /**
+     * @var Slugify
+     */
     protected $slugify;
 
     /**
@@ -25,7 +29,7 @@ trait SlugifyTrait
      *
      * @return string
      */
-    protected function createSlug($source)
+    protected function createSlug($source): string
     {
         if (null === $this->slugify) {
             $this->slugify = new Slugify();
@@ -35,14 +39,16 @@ trait SlugifyTrait
     }
 
     /**
-     * @param $url
+     * @param string $url
      * @param int  $count
      * @param null $pk
      *
      * @return string
      */
-    public function uniqueUrl($url, $count = 0, $pk = null)
+    public function generateUniqueUrl(string $url, int $count = 0, $pk = null): string
     {
+        $url = ltrim($url, '/');
+
         /* @var $model \Mindy\Orm\Model */
         $model = $this->getModel();
         $newUrl = $url;
@@ -50,6 +56,7 @@ trait SlugifyTrait
             $newUrl .= '-'.$count;
         }
 
+        /** @var QuerySetInterface $qs */
         $qs = call_user_func([$model, 'objects'])
             ->filter([$this->getName() => $newUrl]);
         if ($pk) {
@@ -58,7 +65,7 @@ trait SlugifyTrait
         if ($qs->count() > 0) {
             ++$count;
 
-            return $this->uniqueUrl($url, $count, $pk);
+            return $this->generateUniqueUrl($url, $count, $pk);
         }
 
         return $newUrl;

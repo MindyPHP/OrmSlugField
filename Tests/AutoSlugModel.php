@@ -15,6 +15,12 @@ use Mindy\Orm\Fields\AutoSlugField;
 use Mindy\Orm\Fields\CharField;
 use Mindy\Orm\TreeModel;
 
+/**
+ * Class AutoSlugModel
+ *
+ * @property string $slug
+ * @property string $name
+ */
 class AutoSlugModel extends TreeModel
 {
     public static function getFields()

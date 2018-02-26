@@ -17,9 +17,14 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
 {
     protected function getModels()
     {
-        return [new AutoSlugModel()];
+        return [
+            new AutoSlugModel()
+        ];
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testCreate()
     {
         $model = new AutoSlugModel(['name' => 'test']);
@@ -31,6 +36,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('privet-mir', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testClear()
     {
         $model = new AutoSlugModel(['name' => 'test']);
@@ -43,6 +51,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('privet-mir', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testUpdate()
     {
         $model = new AutoSlugModel(['name' => 'test']);
@@ -54,6 +65,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('test', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testCreateParent()
     {
         $parent = new AutoSlugModel(['name' => 'parent']);
@@ -64,6 +78,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('parent/child', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testMoveFromParentToRoot()
     {
         $parent = new AutoSlugModel(['name' => 'parent']);
@@ -78,6 +95,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('child', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testMoveFromParentToAnotherParent()
     {
         $parent1 = new AutoSlugModel(['name' => 'parent1']);
@@ -89,12 +109,19 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $model = new AutoSlugModel(['name' => 'child', 'parent' => $parent1]);
         $this->assertTrue($model->save());
         $this->assertEquals('parent1/child', $model->slug);
+        $this->assertTrue($parent2->save());
+
+        $this->assertTrue($model->save());
+        $this->assertEquals('parent1/child', $model->slug);
 
         $model->parent = $parent2;
         $this->assertTrue($model->save());
         $this->assertEquals('parent2/child', $model->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testMoveRootToAnotherRoot()
     {
         $parent1 = new AutoSlugModel(['name' => 'parent1']);
@@ -108,6 +135,9 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         $this->assertEquals('parent2/parent1', $parent1->slug);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testUpdateParent()
     {
         $parent = new AutoSlugModel(['name' => 'parent']);
@@ -126,5 +156,22 @@ abstract class SlugFieldTest extends OrmDatabaseTestCase
         /** @var \Mindy\Orm\Model $child */
         $child = AutoSlugModel::objects()->get(['name' => 'child']);
         $this->assertSame('tools/child', $child->slug);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testUpdateSlugWithoutChangeParent()
+    {
+        $parent = new AutoSlugModel(['name' => 'parent']);
+        $this->assertTrue($parent->save());
+
+        $child = new AutoSlugModel(['name' => 'child', 'parent' => $parent]);
+        $this->assertTrue($child->save());
+        $this->assertSame('parent/child', $child->slug);
+
+        $child->slug = 'foobar';
+        $child->save();
+        $this->assertSame('parent/foobar', $child->slug);
     }
 }

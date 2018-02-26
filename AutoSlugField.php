@@ -20,11 +20,6 @@ use Mindy\QueryBuilder\Expression;
 class AutoSlugField extends AbstractSlugField
 {
     /**
-     * @var string|null
-     */
-    protected $oldValue;
-
-    /**
      * Internal event.
      *
      * @param \Mindy\Orm\TreeModel|ModelInterface $model
@@ -35,42 +30,17 @@ class AutoSlugField extends AbstractSlugField
         if (empty($value)) {
             $slug = $this->createSlug($model->getAttribute($this->source));
         } else {
-            $slug = $this->getLastSegment($value);
+            $slug = basename($value);
         }
 
         if ($model->parent) {
             $slug = $model->parent->getAttribute($this->getAttributeName()).'/'.ltrim($slug, '/');
         }
 
-        $model->setAttribute($this->getAttributeName(), $this->uniqueUrl(ltrim($slug, '/')));
-    }
-
-    /**
-     * @param $slug
-     *
-     * @return string
-     */
-    protected function getLastSegment($slug)
-    {
-        if (false === strpos($slug, '/')) {
-            return $slug;
-        }
-
-        return substr($slug, strrpos($slug, '/', -1) + 1);
-    }
-
-    /**
-     * @param $slug
-     *
-     * @return string
-     */
-    protected function getParentSegment($slug)
-    {
-        if (false === strpos($slug, '/')) {
-            return $slug;
-        }
-
-        return substr($slug, 0, strrpos($slug, '/', -1));
+        $model->setAttribute(
+            $this->getAttributeName(),
+            $this->generateUniqueUrl($slug)
+        );
     }
 
     /**
@@ -84,17 +54,15 @@ class AutoSlugField extends AbstractSlugField
         if (empty($value)) {
             $slug = $this->createSlug($model->getAttribute($this->source));
         } else {
-            $slug = $this->getLastSegment($value);
+            $slug = basename($value);
         }
 
         if ($model->parent) {
-            $slug = implode('/', [
-                $this->getParentSegment($model->parent->getAttribute($this->getAttributeName())),
-                $slug,
-            ]);
+            $parentSlug = $model->parent->getAttribute($this->getAttributeName());
+            $slug = implode('/', [current(explode('/', $parentSlug)), $slug]);
         }
 
-        $slug = $this->uniqueUrl(ltrim($slug, '/'), 0, $model->pk);
+        $slug = $this->generateUniqueUrl($slug, 0, $model->pk);
 
         $conditions = [
             'lft__gte' => $model->lft,
