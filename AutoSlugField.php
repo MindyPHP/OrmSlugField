@@ -97,16 +97,26 @@ class AutoSlugField extends AbstractSlugField
         $slug = $this->uniqueUrl(ltrim($slug, '/'), 0, $model->pk);
 
         $conditions = [
-            'lft__gte' => $model->getAttribute('lft'),
-            'rgt__lte' => $model->getAttribute('rgt'),
-            'root' => $model->getAttribute('root'),
+            'lft__gte' => $model->lft,
+            'rgt__lte' => $model->rgt,
+            'root' => $model->root,
         ];
 
         $attributeValue = $model->getOldAttribute($this->getAttributeName());
         if (empty($attributeValue)) {
             $attributeValue = $model->getAttribute($this->getAttributeName());
         }
-        $expr = 'REPLACE([['.$this->getAttributeName().']], @'.$attributeValue.'@, @'.$slug.'@)';
+
+        if ($attributeValue === $slug) {
+            return;
+        }
+
+        $expr = sprintf(
+            'REPLACE(%s, %s, %s)',
+            $model->getConnection()->quoteIdentifier($this->getAttributeName()),
+            $model->getConnection()->quote($attributeValue),
+            $model->getConnection()->quote($slug)
+        );
 
         $qs = $model->objects()->filter($conditions);
         $qs->update([
