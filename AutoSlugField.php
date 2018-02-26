@@ -75,21 +75,19 @@ class AutoSlugField extends AbstractSlugField
             $attributeValue = $model->getAttribute($this->getAttributeName());
         }
 
-        if ($attributeValue === $slug) {
-            return;
+        if ($attributeValue !== $slug) {
+            $expr = sprintf(
+                'REPLACE(%s, %s, %s)',
+                $model->getConnection()->quoteIdentifier($this->getAttributeName()),
+                $model->getConnection()->quote($attributeValue),
+                $model->getConnection()->quote($slug)
+            );
+
+            $qs = $model->objects()->filter($conditions);
+            $qs->update([
+                $this->getAttributeName() => new Expression($expr),
+            ]);
         }
-
-        $expr = sprintf(
-            'REPLACE(%s, %s, %s)',
-            $model->getConnection()->quoteIdentifier($this->getAttributeName()),
-            $model->getConnection()->quote($attributeValue),
-            $model->getConnection()->quote($slug)
-        );
-
-        $qs = $model->objects()->filter($conditions);
-        $qs->update([
-            $this->getAttributeName() => new Expression($expr),
-        ]);
 
         $model->setAttribute($this->getAttributeName(), $slug);
     }
