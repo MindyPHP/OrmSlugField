@@ -22,7 +22,7 @@ class SlugField extends AbstractSlugField
     {
         $this->value = empty($this->value) ? $this->createSlug($model->{$this->source}) : $this->value;
         if ($this->unique) {
-            $this->value = $this->uniqueUrl($this->value);
+            $this->value = $this->generateUniqueUrl($this->value);
         }
         $model->setAttribute($this->getAttributeName(), $this->value);
     }
@@ -42,7 +42,7 @@ class SlugField extends AbstractSlugField
         }
 
         if ($this->unique) {
-            $this->value = $this->uniqueUrl($this->value, 0, $model->pk);
+            $this->value = $this->generateUniqueUrl($this->value, 0, $model->pk);
         }
         $model->setAttribute($this->getAttributeName(), $this->value);
     }
